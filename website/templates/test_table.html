@@ -8,32 +8,24 @@
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">BCode</th>
+      {% for column_name in columns %}
+      <th scope="col">{{ column_name }}</th>
+      {% endfor %}
+      <!-- <th scope="col">BCode</th>
       <th scope="col">BVal</th>
       <th scope="col">SVal</th>
       <th scope="col">Balance</th>
-      <th scope="col">Ratio</th>
+      <th scope="col">Ratio</th> -->
     </tr>
   </thead>
+  {% for row in data %}
   <tbody>
     <tr>
-      <th scope="row">1</th>
-      <td>{{ test }}</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
+      {% for cell in row %}
+      <td>{{ cell }}</td>
+      {% endfor %}
     </tr>
   </tbody>
+  {% endfor %}
 </table>
 {% endblock %}

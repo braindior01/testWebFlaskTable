@@ -50,15 +50,15 @@ def input_file():
 
 @bacafile.route('/read-table', methods=['GET', 'POST'])
 def read_table():
+    columns = ['Code','BVal','SVal','Balance','Ratio']
     if request.method == 'POST':
         go_to_page = request.form['inputText']
         if go_to_page == "1":
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = '2024-02-01' AND Sell.unix_date = '2024-02-01' LIMIT 30"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = '2024-02-01' AND Sell.unix_date = '2024-02-01' LIMIT 100"
             cursor.execute(query)
             data = cursor.fetchall()
-            print(data[0])
-            Test = data[0]
+            print(data)
 
-    return render_template("test_table.html", test=Test)
+    return render_template("test_table.html", columns=columns, data=data)

@@ -20,5 +20,6 @@ def lapet():
 
 @views.route('/read-table')
 def kentut():
+    columns = ['Code','BVal','SVal','Balance','Ratio']
 
-    return render_template("test_table.html")
+    return render_template("test_table.html", columns=columns)
