@@ -4,6 +4,7 @@ from .models import create_table_1, create_table_2, insert_to_table_1, insert_to
 from datetime import date
 from datetime import timedelta
 import sqlite3
+from datetime import datetime
 
 bacafile = Blueprint('bacafile', __name__)
 
@@ -13,15 +14,16 @@ def input_file():
     if request.method == 'POST':
         input_file = request.files['inputFile']
         df = pd.read_csv(input_file, sep=';')
-        print(df)
+        today = request.form['inputDate']
+        print(today)
         if ('BVal' in df.columns):
             BCode = df['BCode']
             BVal = df['BVal']
             SCode = df['SCode']
             SVal = df['SVal']
-            today = date.today()
-            yesterday = today - timedelta(days=15)
-            print(BCode)
+            # today = date.today()
+            # yesterday = today - timedelta(days=1)
+            # date_input = datetime.strptime(today, '%d/%m/%y')
             create_table_1()
             create_table_2()
             for EmitenBuy, BuyVal in zip(BCode, BVal):
@@ -52,13 +54,15 @@ def input_file():
 def read_table():
     columns = ['Code','BVal','SVal','Balance','Ratio']
     if request.method == 'POST':
-        go_to_page = request.form['inputText']
-        if go_to_page == "1":
+        # submit = request.form['inputText']
+        date_input = request.form['inputDate']
+        print(date_input)
+        if date_input == date_input:
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = '2024-02-01' AND Sell.unix_date = '2024-02-01' LIMIT 100"
-            cursor.execute(query)
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? LIMIT 100"
+            cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
-            print(data)
+            # print(data)
 
     return render_template("test_table.html", columns=columns, data=data)

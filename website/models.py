@@ -36,6 +36,13 @@ def create_table_2():
     conn.commit()
 
 # *********************************************
+    
+def create_table_3():
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS join_balance (id INTEGER PRIMARY KEY AUTOINCREMENT, Emiten char, Buy_Val float, Sell_Val float, Balance float, unix_date date)""")
+    conn.commit()
+
+
 # langkah selanjutnya membuat table dalam database untuk dapat di isi oleh data dari API
 
 
@@ -60,3 +67,9 @@ def read_table():
     cursor.execute(query)
     data = cursor.fetchall()
     print(data)
+
+
+def insert_to_table_3(value_1, value_2, value_3, value_4, value_5):
+    query = f"INSERT INTO join_balance (Emiten,Buy_Val,Sell_Val,Balance,unix_date) VALUES (?, ?, ?, ?, ?);"
+    cursors = conn.execute(query, (value_1, value_2, value_3, value_4, value_5))
+    conn.commit()
