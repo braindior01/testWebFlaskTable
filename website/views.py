@@ -23,3 +23,9 @@ def kentut():
     columns = ['Code','BVal','SVal','Balance','Ratio']
 
     return render_template("test_table.html", columns=columns)
+
+
+@views.route('/input-PER')
+def mamam():
+
+    return render_template("input_PER_PBV.html")
