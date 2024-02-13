@@ -52,17 +52,33 @@ def input_file():
 
 @bacafile.route('/read-table', methods=['GET', 'POST'])
 def read_table():
-    columns = ['Code','BVal','SVal','Balance','Ratio']
+    columns = ['Code','BVal','SVal','Balance','Ratio', 'Date']
     if request.method == 'POST':
         # submit = request.form['inputText']
         date_input = request.form['inputDate']
+        emiten_input = request.form['inputEmiten']
         print(date_input)
-        if date_input == date_input:
+        if emiten_input == "":
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? LIMIT 100"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? LIMIT 100"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
             # print(data)
+        elif date_input == "" :
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = Sell.unix_date AND buy.EmitenBuy = ?"
+            cursor.execute(query, (emiten_input,))
+            data = cursor.fetchall()
+            # print(data)
+        else:
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? AND Buy.EmitenBuy= ?"
+            cursor.execute(query, (date_input, date_input, emiten_input))
+            data = cursor.fetchall()
+            # print(data)
+
 
     return render_template("test_table.html", columns=columns, data=data)

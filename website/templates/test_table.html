@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content %}
 <form action="#" method="post">
   <input type="date" name="inputDate" />
+  <input type="text" name="inputEmiten"/>
   <button type="submit">Submit</button>
 </form>
 </br>
@@ -20,9 +21,15 @@
   {% for row in data %}
   <tbody>
     <tr>
-      {% for cell in row %}
+      <td>{{row.0}}</td>
+      <td>{{"{:,.0f}".format(row.1)}}</td>
+      <td>{{"{:,.0f}".format(row.2)}}</td>
+      <td>{{"{:,.0f}".format(row.3)}}</td>
+      <td>{{row.4}}</td>
+      <td>{{row.5}}</td>
+      <!-- {% for cell in row %}
       <td>{{ cell }}</td>
-      {% endfor %}
+      {% endfor %} -->
     </tr>
   </tbody>
   {% endfor %}

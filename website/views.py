@@ -20,12 +20,17 @@ def lapet():
 
 @views.route('/read-table')
 def kentut():
-    columns = ['Code','BVal','SVal','Balance','Ratio']
+    columns = ['Code','BVal','SVal','Balance','Ratio', 'Date']
 
     return render_template("test_table.html", columns=columns)
 
+# @views.route('/read-table2')
+# def asem():
+#     columns = ['Code','BVal','SVal','Balance','Ratio', 'Date']
 
-@views.route('/input-PER')
-def mamam():
+#     return render_template("table_2.html", columns=columns)
 
-    return render_template("input_PER_PBV.html")
+# @views.route('/input-PER')
+# def mamam():
+
+#     return render_template("input_PER_PBV.html")
