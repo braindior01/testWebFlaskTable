@@ -30,7 +30,12 @@ def kentut():
 
 #     return render_template("table_2.html", columns=columns)
 
-# @views.route('/input-PER')
-# def mamam():
+@views.route('/input-hargawajar')
+def mamam():
 
-#     return render_template("input_PER_PBV.html")
+    return render_template("input_harga_wajar.html")
+
+@views.route('/input-hargaclosing')
+def enak():
+
+    return render_template("input_harga_closing.html")

@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<div class="input-container">
+  <form action="#" method="post" enctype=multipart/form-data>
+  <label for="inputText">Select a file Buat Closing:</label>
+  <input type="file" name="inputFile_Closing" id="myFile" />
+  <input type="date" name="inputDate" id="csvDate" />
+</div>
+
+<button type="submit">Submit</button>
+
+{% endblock %}

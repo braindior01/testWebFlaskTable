@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 import pandas as pd
-from .models import create_table_1, create_table_2, insert_to_table_1, insert_to_table_2, read_table
+from .models import create_table_1, create_table_2, insert_to_table_1, insert_to_table_2, read_table, create_table_3, insert_to_table_3, insert_to_table_4, create_table_4
 from datetime import date
 from datetime import timedelta
 import sqlite3
@@ -82,3 +82,63 @@ def read_table():
 
 
     return render_template("test_table.html", columns=columns, data=data)
+
+
+@bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
+def input_file_harga_wajar():
+    if request.method == 'POST':
+        input_file = request.files['inputFile']
+        df = pd.read_excel(input_file)
+        if ('Bcode' in df.columns):
+            BCode = df['Bcode']
+            Harga_Wajar = df['Harga_Wajar']
+            create_table_3()
+            for Emiten, Harga_Wajar in zip(BCode, Harga_Wajar):
+                insert_to_table_3(value_1=Emiten,
+                                  value_2=Harga_Wajar)
+
+            json_response = {'response': "SUCCESS",
+                             'total emiten': 'Ok',
+                             'total val': 'Ok'
+                             }
+            json_response = jsonify(json_response)
+            return json_response
+        else:
+            json_response = {
+                'ERROR_WARNING': "NO COLUMNS 'Tweet' APPEAR ON THE UPLOADED FILE"}
+            json_response = jsonify(json_response)
+            return json_response
+        return json_response
+    else:
+        return render_template("input_harga_wajar.html")
+
+@bacafile.route('/input-hargaclosing', methods=['GET', 'POST'])
+def input_file_closing():
+    if request.method == 'POST':
+        input_file = request.files['inputFile_Closing']
+        df = pd.read_excel(input_file)
+        today = request.form['inputDate']
+        if ('Kode Saham' in df.columns):
+            BCode = df['Kode Saham']
+            Close = df['Penutupan']
+            total_emiten = len(set(BCode))
+            create_table_4()
+            for Emiten, Close_Price in zip(BCode, Close):
+                insert_to_table_4(value_1=Emiten,
+                                  value_2=Close_Price, value_3=today)
+
+            json_response = {'response': "SUCCESS",
+                             'total emiten': total_emiten,
+                             'date_inputed': today
+                             }
+            json_response = jsonify(json_response)
+            return json_response
+        else:
+            json_response = {
+                'ERROR_WARNING': "NO COLUMNS 'Tweet' APPEAR ON THE UPLOADED FILE"}
+            json_response = jsonify(json_response)
+            return json_response
+        return json_response
+    else:
+        return render_template("input_PER_PBV.html")
+
