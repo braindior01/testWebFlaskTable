@@ -24,6 +24,7 @@ def input_file():
             # today = date.today()
             # yesterday = today - timedelta(days=1)
             # date_input = datetime.strptime(today, '%d/%m/%y')
+            total_emiten = len(set(BCode))
             create_table_1()
             create_table_2()
             for EmitenBuy, BuyVal in zip(BCode, BVal):
@@ -35,8 +36,8 @@ def input_file():
                                   value_2=SellVal, value_3=today)
 
             json_response = {'response': "SUCCESS",
-                             'total emiten': 'Ok',
-                             'total val': 'Ok'
+                             'total emiten': total_emiten,
+                             'total val': today
                              }
             json_response = jsonify(json_response)
             return json_response
@@ -47,7 +48,7 @@ def input_file():
             return json_response
         return json_response
     else:
-        return render_template("test_file_input.html")
+        return render_template("input_buysell_val.html")
 
 
 @bacafile.route('/read-table', methods=['GET', 'POST'])
@@ -81,7 +82,7 @@ def read_table():
             # print(data)
 
 
-    return render_template("test_table.html", columns=columns, data=data)
+    return render_template("read_table.html", columns=columns, data=data)
 
 
 @bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
@@ -140,5 +141,5 @@ def input_file_closing():
             return json_response
         return json_response
     else:
-        return render_template("input_PER_PBV.html")
+        return render_template("input_harga_closing.html")
 

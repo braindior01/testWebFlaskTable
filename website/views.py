@@ -15,14 +15,14 @@ def home():
 def lapet():
     print('test lapet kelen')
 
-    return render_template("test_file_input.html")
+    return render_template("input_buysell_val.html")
 
 
 @views.route('/read-table')
 def kentut():
     columns = ['Code','BVal','SVal','Balance','Ratio', 'Date']
 
-    return render_template("test_table.html", columns=columns)
+    return render_template("read_table.html", columns=columns)
 
 # @views.route('/read-table2')
 # def asem():
