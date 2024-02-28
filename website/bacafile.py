@@ -62,14 +62,14 @@ def read_table():
         if emiten_input == "":
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? LIMIT 100"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? ORDER BY Ratio DESC LIMIT 100"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
             # print(data)
         elif date_input == "" :
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = Sell.unix_date AND buy.EmitenBuy = ?"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = Sell.unix_date AND buy.EmitenBuy = ? ORDER BY Buy.unix_date DESC"
             cursor.execute(query, (emiten_input,))
             data = cursor.fetchall()
             # print(data)
@@ -82,7 +82,7 @@ def read_table():
             # print(data)
 
 
-    return render_template("read_table.html", columns=columns, data=data)
+    return render_template("read_table.html", columns=columns, data=data, date_input=date_input)
 
 
 @bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
@@ -142,4 +142,54 @@ def input_file_closing():
         return json_response
     else:
         return render_template("input_harga_closing.html")
+
+@bacafile.route('/test-input-txt', methods=['GET', 'POST'])
+def test_input_txt():
+    if request.method == 'POST':
+        lapet = request.form['inputEmiten']
+        bakpao = request.form['input_PER']
+        sampai = request.form['input_PBV']
+
+        print(lapet)
+        json_response = {'response': bakpao,
+                             'total emiten': lapet,
+                             'date_inputed': sampai
+                             }
+        json_response = jsonify(json_response)
+        return json_response
+    else:
+        return render_template("test_per.html")
+    
+@bacafile.route('/read-harga-wajar', methods=['GET', 'POST'])
+def baca_harga_wajar():
+    columns = ['Code','BVal','SVal','Balance','Ratio', 'Close Price', 'Harga Wajar', 'Date']
+    if request.method == 'POST':
+        # submit = request.form['inputText']
+        date_input = request.form['inputDate']
+        emiten_input = request.form['inputEmiten']
+        print(date_input)
+        if emiten_input == "":
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = ? AND Sell.unix_date = ? ORDER BY Ratio DESC"
+            cursor.execute(query, (date_input, date_input))
+            data = cursor.fetchall()
+            # print(data)
+        elif date_input == "" :
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = Sell.unix_date AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ? ORDER BY Buy.unix_date DESC"
+            cursor.execute(query, (emiten_input, emiten_input))
+            data = cursor.fetchall()
+            # print(data)
+        else:
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = ? AND Sell.unix_date = ? AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ?"
+            cursor.execute(query, (date_input, date_input, emiten_input, emiten_input))
+            data = cursor.fetchall()
+            # print(data)
+
+    return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input)
+
 

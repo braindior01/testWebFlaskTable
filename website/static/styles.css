@@ -1,0 +1,20 @@
+form {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+.atur_tanggal {
+    display: inline-block;
+    position: absolute;
+    top: 80px;
+    right: 200px;
+    margin: 0;
+    padding: 0;
+}
+
+input[type="date"],
+input[type="text"],
+button {
+  vertical-align: top;
+}
