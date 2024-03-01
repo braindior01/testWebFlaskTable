@@ -18,3 +18,12 @@ input[type="text"],
 button {
   vertical-align: top;
 }
+
+.cek-lapet {
+  color: green;
+  position: absolute;
+  top: 100px;
+  left: 75px;
+  margin: 0;
+  padding: 0;
+}
