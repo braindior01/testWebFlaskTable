@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 import pandas as pd
 from .models import create_table_1, create_table_2, insert_to_table_1, insert_to_table_2, read_table, create_table_3, insert_to_table_3, insert_to_table_4, create_table_4
-from datetime import date
 from datetime import timedelta
 import sqlite3
 from datetime import datetime
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 bacafile = Blueprint('bacafile', __name__)
 
@@ -65,6 +66,7 @@ def read_table():
             query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ?"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
+            num_rows = len(data)
             # print(data)
         elif date_input == "" :
             connection = sqlite3.connect('instance/database.db')
@@ -72,6 +74,7 @@ def read_table():
             query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = Sell.unix_date AND buy.EmitenBuy = ? ORDER BY Buy.unix_date DESC"
             cursor.execute(query, (emiten_input,))
             data = cursor.fetchall()
+            num_rows = len(data)
             # print(data)
         else:
             connection = sqlite3.connect('instance/database.db')
@@ -79,10 +82,11 @@ def read_table():
             query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? AND Buy.EmitenBuy= ?"
             cursor.execute(query, (date_input, date_input, emiten_input))
             data = cursor.fetchall()
+            num_rows = len(data)
             # print(data)
 
 
-    return render_template("read_table.html", columns=columns, data=data, date_input=date_input)
+    return render_template("read_table.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows)
 
 
 @bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
@@ -174,22 +178,59 @@ def baca_harga_wajar():
             query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = ? AND Sell.unix_date = ? ORDER BY BuyVal DESC"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
-            print(data)
+            num_rows = len(data)
+            # print(data)
         elif date_input == "" :
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = Sell.unix_date AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ? ORDER BY Buy.unix_date DESC"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = Sell.unix_date AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ? ORDER BY Buy.unix_date ASC"
             cursor.execute(query, (emiten_input, emiten_input))
             data = cursor.fetchall()
-            # print(data)
+            num_rows = len(data)
+            x_values = [row[7] for row in data]
+            dates = [datetime.strptime(date, '%Y-%m-%d') for date in x_values]
+            buy_values = [row[1] for row in data]
+            sell_values = [row[2] for row in data]
+            y_values = [row[4] for row in data]
+            closing_values = [row[5] for row in data]
+
+            title = [row[0] for row in data][0]
+
+            fig, axs = plt.subplots(3, 1, figsize=(12, 8))
+            axs[0].plot(dates,buy_values,marker='o')
+            axs[0].plot(dates,sell_values,marker='o')
+            axs[0].grid(True)
+            axs[0].set_title(title)
+            axs[0].legend_drawn_flag = True
+            axs[0].legend(['Buy', 'Sell'], loc=2)
+            axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[0].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+
+            axs[1].plot(dates,y_values,marker='o')
+            axs[1].grid(True)
+            axs[1].legend_drawn_flag = True
+            axs[1].legend(['Ratio'], loc=2)
+            axs[1].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[1].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+
+            axs[2].plot(dates,closing_values,marker='o')
+            axs[2].grid(True)
+            axs[2].legend_drawn_flag = True
+            axs[2].legend(['Ratio'], loc=2)
+            axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[2].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+           
+            plot_file = "website/static/plot.png"
+            plt.savefig(plot_file, dpi=100)
         else:
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
             query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = ? AND Sell.unix_date = ? AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ?"
             cursor.execute(query, (date_input, date_input, emiten_input, emiten_input))
             data = cursor.fetchall()
+            num_rows = len(data)
             # print(data)
 
-    return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input)
+    return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows, plot=plot_file)
 
 

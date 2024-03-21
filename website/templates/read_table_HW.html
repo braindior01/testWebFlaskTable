@@ -1,18 +1,18 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} 
+{% extends "base.html" %} {% block title %}Harga Wajar{% endblock %} 
 {% block content%}
 
 <form action="#" method="post">
     <input type="date" name="inputDate" />
     <input type="text" name="inputEmiten"/>
     <button type="submit">Submit</button>
-    <button type="BBRI">BBRI</button>
-    <button type="BBCA">BBCA</button>
-    <button type="BBNI">BBNI</button>
-    <button type="BMRI">BMRI</button>
   </form>
     <p class="atur_tanggal">Date : {{ date_input }}</p>
   </br>
+    <p class="num_rows">Jumlah Emiten : {{ num_rows }}</p>
   </br>
+  <div class="image-container">
+    <img class="chart_plot_1" src="static/plot.png", alt="Plot">
+  </div>  
   <table class="table">
     <thead>
       <tr>
