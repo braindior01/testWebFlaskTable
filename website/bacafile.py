@@ -63,7 +63,7 @@ def read_table():
         if emiten_input == "":
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ?"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell WHERE Buy.unix_date = ? AND Sell.unix_date = ? ORDER BY Ratio DESC"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
             num_rows = len(data)
@@ -216,7 +216,7 @@ def baca_harga_wajar():
             axs[2].plot(dates,closing_values,marker='o')
             axs[2].grid(True)
             axs[2].legend_drawn_flag = True
-            axs[2].legend(['Ratio'], loc=2)
+            axs[2].legend(['Close Price'], loc=2)
             axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=3))
             axs[2].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
            
@@ -231,6 +231,6 @@ def baca_harga_wajar():
             num_rows = len(data)
             # print(data)
 
-    return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows, plot=plot_file)
+    return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows)
 
 
