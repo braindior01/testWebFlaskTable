@@ -20,7 +20,7 @@ def home():
 
 @views.route('/read-table')
 def kentut():
-    columns = ['Code','BVal','SVal','Balance','Ratio', 'Date']
+    columns = ['Code','BVal','SVal','Balance','Ratio','Close Price', 'Date']
 
     return render_template("read_table.html", columns=columns)
 
