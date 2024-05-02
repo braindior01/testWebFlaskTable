@@ -63,7 +63,7 @@ def read_table():
         if emiten_input == "":
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date WHERE Buy.unix_date = ? AND Sell.unix_date = ? ORDER BY RATIO DESC"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date WHERE Buy.unix_date = ? AND Sell.unix_date = ?"
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
             num_rows = len(data)
@@ -197,14 +197,14 @@ def baca_harga_wajar():
             title = [row[0] for row in data][0]
 
             fig, axs = plt.subplots(3, 1, figsize=(12, 8))
-            axs[0].plot(dates,buy_values,marker='o')
-            axs[0].plot(dates,sell_values,marker='o')
-            axs[0].grid(True)
-            axs[0].set_title(title)
-            axs[0].legend_drawn_flag = True
-            axs[0].legend(['Buy', 'Sell'], loc=2)
-            axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=3))
-            axs[0].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+            axs[2].plot(dates,buy_values,marker='o')
+            axs[2].plot(dates,sell_values,marker='o')
+            axs[2].grid(True)
+            axs[2].set_title(title)
+            axs[2].legend_drawn_flag = True
+            axs[2].legend(['Buy', 'Sell'], loc=2)
+            axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[2].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
 
             axs[1].plot(dates,y_values,marker='o')
             axs[1].grid(True)
@@ -213,12 +213,12 @@ def baca_harga_wajar():
             axs[1].xaxis.set_major_locator(mdates.DayLocator(interval=3))
             axs[1].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
 
-            axs[2].plot(dates,closing_values,marker='o')
-            axs[2].grid(True)
-            axs[2].legend_drawn_flag = True
-            axs[2].legend(['Close Price'], loc=2)
-            axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=3))
-            axs[2].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
+            axs[0].plot(dates,closing_values,marker='o')
+            axs[0].grid(True)
+            axs[0].legend_drawn_flag = True
+            axs[0].legend(['Close Price'], loc=2)
+            axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[0].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
            
             plot_file = "website/static/plot.png"
             plt.savefig(plot_file, dpi=100)
