@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import numpy as np
 
 bacafile = Blueprint('bacafile', __name__)
 
@@ -183,7 +184,7 @@ def baca_harga_wajar():
         elif date_input == "" :
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
-            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = Sell.unix_date AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ? ORDER BY Buy.unix_date ASC"
+            query = r"SELECT Buy.EmitenBuy, Buy.BuyVal, Sell.SellVal, Buy.BuyVal - Sell.SellVal AS Balance, ROUND(Buy.BuyVal / Sell.SellVal,2) AS Ratio, harga_closing.Close_Price, harga_wajar.Harga_Wajar, Buy.unix_date, Buy.margin FROM Buy INNER JOIN Sell ON Buy.EmitenBuy = Sell.EmitenSell AND Buy.unix_date = Sell.unix_date INNER JOIN harga_closing ON Buy.EmitenBuy = harga_closing.Emiten AND Buy.unix_date = harga_closing.unix_date INNER JOIN harga_wajar ON Buy.EmitenBuy = harga_wajar.Emiten WHERE Buy.unix_date = Sell.unix_date AND Buy.EmitenBuy= ? AND Sell.EmitenSell = ? ORDER BY Buy.unix_date ASC"
             cursor.execute(query, (emiten_input, emiten_input))
             data = cursor.fetchall()
             num_rows = len(data)
@@ -193,6 +194,7 @@ def baca_harga_wajar():
             sell_values = [row[2] for row in data]
             y_values = [row[4] for row in data]
             closing_values = [row[5] for row in data]
+            plot_y = [row[8] for row in data]
 
             title = [row[0] for row in data][0]
 
@@ -200,24 +202,27 @@ def baca_harga_wajar():
             axs[2].plot(dates,buy_values,marker='o')
             axs[2].plot(dates,sell_values,marker='o')
             axs[2].grid(True)
-            axs[2].set_title(title)
             axs[2].legend_drawn_flag = True
             axs[2].legend(['Buy', 'Sell'], loc=2)
-            axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[2].xaxis.set_major_locator(mdates.DayLocator(interval=7))
             axs[2].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
 
             axs[1].plot(dates,y_values,marker='o')
+            axs[1].plot(dates,plot_y,linestyle='--', color='k')
+            # axs[1].set_yticks(np.arange(-5, 6, 1))
+            # axs[1].set_ylim(-10,10)
             axs[1].grid(True)
             axs[1].legend_drawn_flag = True
             axs[1].legend(['Ratio'], loc=2)
-            axs[1].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[1].xaxis.set_major_locator(mdates.DayLocator(interval=7))
             axs[1].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
 
             axs[0].plot(dates,closing_values,marker='o')
             axs[0].grid(True)
+            axs[0].set_title(title)
             axs[0].legend_drawn_flag = True
             axs[0].legend(['Close Price'], loc=2)
-            axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=3))
+            axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=7))
             axs[0].xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
            
             plot_file = "website/static/plot.png"
