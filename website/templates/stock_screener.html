@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block title %}Stock Screener{% endblock %} {% block content %}
+<form action="#" method="post">
+  <input type="date" name="inputDate" />
+  <input type="text" name="inputEmiten"/>
+  <button type="submit">Submit</button>
+</form>
+  <p class="atur_tanggal">Date : {{ date_input }}</p>
+</br>
+  <p class="num_rows">Jumlah Emiten : {{ num_rows }}</p>
+</br>
+</br>
+<table class="table">
+  <thead>
+    <tr>
+      {% for column_name in columns %}
+      <th scope="col">{{ column_name }}</th>
+      {% endfor %}
+      <!-- <th scope="col">BCode</th>
+      <th scope="col">BVal</th>
+      <th scope="col">SVal</th>
+      <th scope="col">Balance</th>
+      <th scope="col">Ratio</th> -->
+    </tr>
+  </thead>
+  {% for row in data %}
+  <tbody>
+    <tr>
+      <td>{{row.0}}</td>
+      <td>{{"{:,.0f}".format(row.1)}}</td>
+      <td>{{"{:,.0f}".format(row.2)}}</td>
+      <td>{{"{:,.0f}".format(row.3)}}</td>
+      <td>{{row.4}}</td>
+      <td>{{"{:,.0f}".format(row.5)}}</td>
+      <td>{{row.6}}</td>
+      <!-- {% for cell in row %}
+      <td>{{ cell }}</td>
+      {% endfor %} -->
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
+{% endblock %}

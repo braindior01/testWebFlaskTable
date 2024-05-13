@@ -90,33 +90,33 @@ def read_table():
     return render_template("read_table.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows)
 
 
-@bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
-def input_file_harga_wajar():
-    if request.method == 'POST':
-        input_file = request.files['inputFile']
-        df = pd.read_excel(input_file)
-        if ('Bcode' in df.columns):
-            BCode = df['Bcode']
-            Harga_Wajar = df['Harga_Wajar']
-            create_table_3()
-            for Emiten, Harga_Wajar in zip(BCode, Harga_Wajar):
-                insert_to_table_3(value_1=Emiten,
-                                  value_2=Harga_Wajar)
+# @bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
+# def input_file_harga_wajar():
+#     if request.method == 'POST':
+#         input_file = request.files['inputFile']
+#         df = pd.read_excel(input_file)
+#         if ('Bcode' in df.columns):
+#             BCode = df['Bcode']
+#             Harga_Wajar = df['Harga_Wajar']
+#             create_table_3()
+#             for Emiten, Harga_Wajar in zip(BCode, Harga_Wajar):
+#                 insert_to_table_3(value_1=Emiten,
+#                                   value_2=Harga_Wajar)
 
-            json_response = {'response': "SUCCESS",
-                             'total emiten': 'Ok',
-                             'total val': 'Ok'
-                             }
-            json_response = jsonify(json_response)
-            return json_response
-        else:
-            json_response = {
-                'ERROR_WARNING': "NO COLUMNS 'Tweet' APPEAR ON THE UPLOADED FILE"}
-            json_response = jsonify(json_response)
-            return json_response
-        return json_response
-    else:
-        return render_template("input_harga_wajar.html")
+#             json_response = {'response': "SUCCESS",
+#                              'total emiten': 'Ok',
+#                              'total val': 'Ok'
+#                              }
+#             json_response = jsonify(json_response)
+#             return json_response
+#         else:
+#             json_response = {
+#                 'ERROR_WARNING': "NO COLUMNS 'Tweet' APPEAR ON THE UPLOADED FILE"}
+#             json_response = jsonify(json_response)
+#             return json_response
+#         return json_response
+#     else:
+#         return render_template("input_harga_wajar.html")
 
 @bacafile.route('/input-hargaclosing', methods=['GET', 'POST'])
 def input_file_closing():
@@ -148,22 +148,22 @@ def input_file_closing():
     else:
         return render_template("input_harga_closing.html")
 
-@bacafile.route('/test-input-txt', methods=['GET', 'POST'])
-def test_input_txt():
-    if request.method == 'POST':
-        lapet = request.form['inputEmiten']
-        bakpao = request.form['input_PER']
-        sampai = request.form['input_PBV']
+# @bacafile.route('/test-input-txt', methods=['GET', 'POST'])
+# def test_input_txt():
+#     if request.method == 'POST':
+#         lapet = request.form['inputEmiten']
+#         bakpao = request.form['input_PER']
+#         sampai = request.form['input_PBV']
 
-        print(lapet)
-        json_response = {'response': bakpao,
-                             'total emiten': lapet,
-                             'date_inputed': sampai
-                             }
-        json_response = jsonify(json_response)
-        return json_response
-    else:
-        return render_template("test_per.html")
+#         print(lapet)
+#         json_response = {'response': bakpao,
+#                              'total emiten': lapet,
+#                              'date_inputed': sampai
+#                              }
+#         json_response = jsonify(json_response)
+#         return json_response
+#     else:
+#         return render_template("test_per.html")
     
 @bacafile.route('/read-harga-wajar', methods=['GET', 'POST'])
 def baca_harga_wajar():
@@ -238,4 +238,31 @@ def baca_harga_wajar():
 
     return render_template("read_table_HW.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows)
 
+@bacafile.route('/input-hargawajar', methods=['GET', 'POST'])
+def input_file_harga_wajar():
+    if request.method == 'POST':
+        input_file = request.files['inputFile']
+        df = pd.read_excel(input_file)
+        if ('Stock' in df.columns):
+            BCode = df['Bcode']
+            Harga_Wajar = df['Harga_Wajar']
+            create_table_3()
+            for Emiten, Harga_Wajar in zip(BCode, Harga_Wajar):
+                insert_to_table_3(value_1=Emiten,
+                                  value_2=Harga_Wajar)
+
+            json_response = {'response': "SUCCESS",
+                             'total emiten': 'Ok',
+                             'total val': 'Ok'
+                             }
+            json_response = jsonify(json_response)
+            return json_response
+        else:
+            json_response = {
+                'ERROR_WARNING': "NO COLUMNS 'Tweet' APPEAR ON THE UPLOADED FILE"}
+            json_response = jsonify(json_response)
+            return json_response
+        return json_response
+    else:
+        return render_template("input_harga_wajar.html")
 
