@@ -50,3 +50,9 @@ def balsem():
     columns = ['Code','BVal','SVal','Balance','Ratio', 'Close Price', 'Harga Wajar', 'Date']
 
     return render_template("read_table_HW.html", columns=columns)
+
+@views.route('/read-stock-screener')
+def read_screener():
+    columns = ['Stock','Close Price','Market Cap','Revenue Anl','NetProfit Anl','PER Anl','PBV Anl','ROE Anl']
+
+    return render_template("stock_screener.html", columns=columns)

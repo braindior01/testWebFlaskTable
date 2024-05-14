@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 import pandas as pd
-from .models import create_table_1, create_table_2, insert_to_table_1, insert_to_table_2, read_table, create_table_3, insert_to_table_3, insert_to_table_4, create_table_4
+from .models import create_table_1, create_table_2, insert_to_table_1, insert_to_table_2, read_table, create_table_3, insert_to_table_3, insert_to_table_4, create_table_4, create_table_5, insert_to_table_5
 from datetime import timedelta
 import sqlite3
 from datetime import datetime
@@ -244,12 +244,50 @@ def input_file_harga_wajar():
         input_file = request.files['inputFile']
         df = pd.read_excel(input_file)
         if ('Stock' in df.columns):
-            BCode = df['Bcode']
-            Harga_Wajar = df['Harga_Wajar']
-            create_table_3()
-            for Emiten, Harga_Wajar in zip(BCode, Harga_Wajar):
-                insert_to_table_3(value_1=Emiten,
-                                  value_2=Harga_Wajar)
+            BCode = df['Stock']
+            market_cap = df['Market Cap']
+            revenue_act = df['Revenue Act']
+            revenue_anl = df['Revenue Anl']
+            net_profit_act = df['NetProfit Act']
+            net_profit_anl = df['NetProfit Anl']
+            ebitda_act = df['EBITDA Act']
+            ebitda_anl = df['EBITDA Anl']
+            per_act = df['PER Act']
+            per_anl = df['PER Anl']
+            eps_act = df['EPS Act']
+            eps_anl = df['EPS Anl']
+            pbv_act = df['PBV Act']
+            pbv_anl = df['PBV Anl']
+            roa_act = df['ROA Act']
+            roa_anl = df['ROA Anl']
+            roe_act = df['ROE Act']
+            roe_anl = df['ROE Anl']
+            evperebitda_act = df['EVEBITDA Act']
+            evperebitda_anl = df['EVEBITDA Anl']
+            debperequity_act = df['DebtEquity Act']
+            create_table_5()
+            for Emiten, Market_Cap, Revenue_Act, Revenue_Anl, NetProfit_Act, NetProfit_Anl, EBITDA_Act, EBITDA_Anl, PER_Act, PER_Anl, EPS_Act, EPS_Anl, PBV_Act, PBV_Anl, ROA_Act, ROA_Anl, ROE_Act, ROE_Anl, EVEBITDA_Act, EVEBITDA_Anl, DebtEquity_Act in zip(BCode, market_cap, revenue_act, revenue_anl, net_profit_act, net_profit_anl, ebitda_act, ebitda_anl, per_act, per_anl, eps_act, eps_anl, pbv_act, pbv_anl, roa_act, roa_anl, roe_act, roe_anl, evperebitda_act, evperebitda_anl, debperequity_act):
+                insert_to_table_5(value_1=Emiten,
+                                  value_2=Market_Cap,
+                                  value_3=Revenue_Act,
+                                  value_4=Revenue_Anl,
+                                  value_5=NetProfit_Act,
+                                  value_6=NetProfit_Anl,
+                                  value_7=EBITDA_Act,
+                                  value_8=EBITDA_Anl,
+                                  value_9=PER_Act,
+                                  value_10=PER_Anl,
+                                  value_11=EPS_Act,
+                                  value_12=EPS_Anl,
+                                  value_13=PBV_Act,
+                                  value_14=PBV_Anl,
+                                  value_15=ROA_Act,
+                                  value_16=ROA_Anl,
+                                  value_17=ROE_Act,
+                                  value_18=ROE_Anl,
+                                  value_19=EVEBITDA_Act,
+                                  value_20=EVEBITDA_Anl,
+                                  value_21=DebtEquity_Act)
 
             json_response = {'response': "SUCCESS",
                              'total emiten': 'Ok',
@@ -266,3 +304,18 @@ def input_file_harga_wajar():
     else:
         return render_template("input_harga_wajar.html")
 
+@bacafile.route('/read-stock-screener', methods=['GET', 'POST'])
+def read_screener():
+    columns = ['Stock','Close Price','Market Cap','Revenue Anl','NetProfit Anl','PER Anl','PBV Anl','ROE Anl']
+    date_input = request.form['inputDate']
+    print(date_input)
+    if request.method == 'POST':
+            connection = sqlite3.connect('instance/database.db')
+            cursor = connection.cursor()
+            query = r"SELECT stock_screener.Emiten, harga_closing.Close_Price, stock_screener.Market_Cap, stock_screener.Revenue_Anl, stock_screener.NetProfit_Anl, stock_screener.PER_Anl, stock_screener.PBV_Anl, stock_screener.ROE_Anl FROM stock_screener INNER JOIN harga_closing ON stock_screener.Emiten = harga_closing.Emiten AND harga_closing.unix_date = ? ORDER BY stock_screener.Market_Cap DESC"
+            cursor.execute(query, (date_input,))
+            data = cursor.fetchall()
+            num_rows = len(data)
+            # print(data)
+
+    return render_template("stock_screener.html", columns=columns, data=data, date_input=date_input, num_rows=num_rows)
