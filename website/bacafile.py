@@ -60,6 +60,7 @@ def read_table():
         # submit = request.form['inputText']
         date_input = request.form['inputDate']
         emiten_input = request.form['inputEmiten']
+        # balance_input = request.form['screener']
         print(date_input)
         if emiten_input == "":
             connection = sqlite3.connect('instance/database.db')
@@ -68,7 +69,7 @@ def read_table():
             cursor.execute(query, (date_input, date_input))
             data = cursor.fetchall()
             num_rows = len(data)
-            # print(data)
+            # print(balance_input)
         elif date_input == "" :
             connection = sqlite3.connect('instance/database.db')
             cursor = connection.cursor()
